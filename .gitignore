@@ -13,6 +13,9 @@
 # RubyMine exclusions
 /.idea
 
+# Gemfile.lock should be ignored to allow easy install on other systems
+/Gemfile.lock
+
 # Used by dotenv library to load environment variables.
 # .env
 
