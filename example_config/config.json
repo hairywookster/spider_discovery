@@ -1,3 +1,4 @@
 {
+  "log_level": "debug",
   "todo": "define the config"
 }

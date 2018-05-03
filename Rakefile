@@ -5,7 +5,9 @@ require 'rake'
 require 'fileutils'
 require 'json'
 require 'mechanize'
+require 'methodize'
 require 'metainspector'
+require 'logger'
 
 def auto_require(path)
   Dir["#{File.dirname(__FILE__)}#{path}/*.rb"].each do |file|
@@ -13,6 +15,7 @@ def auto_require(path)
   end
 end
 
+auto_require '/lib'
 auto_require '/tasks'
 
 
@@ -35,5 +38,5 @@ end
 
 desc 'validates the config file is valid. Usage: validate_config["<path to the config file>"]'
 task :validate_config, :config_file do |t, args|
-  ConfigValidator.validate_all_json_config_files( args[:config_file] )
+  ConfigValidator.validate_config_file( args[:config_file] )
 end

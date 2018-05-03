@@ -8,12 +8,12 @@ But first we need a way to identify the existing pages.
 Once we have discovered our pages we can use the output of the spider in subsequent automated test tools.
 
 A spider essentially runs the following procees
-* Add initial URL to visit to URLs to be visited
+* Add initial URL to visit to "URLs to be visited"
 * Visit URL
-* Add URL to list of visited URLs
+* Add URL to list of "visited URLs"
 * Scan content for referenced URLs
-* Add each URL to the list of URLs to be processsed, if it has not already been visited
-* repeat from step 2 until no more URLs to visit
+* Add each URL to the list of "URLs to be visited", if it has not already been visited
+* repeat from step 2 until no more "URLs to be visited"
 
 Most websites, ignoring Single Page Apps, concist of multipe pages, with each page containing multiple links to areas inside and outside of the primary web site. Often though many pages cannot be located or reached solely by following all links from a starting page. 
 We need to consider the following additional aspects.
