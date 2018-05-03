@@ -41,7 +41,98 @@ We need to consider the following additional aspects.
 - bundle install
 
 ## Usage
-TODO (configure, run, output)
+### Configuration
+Rather than depending on an arcane and ever growing set of command line variables, lets keep things simple and use a 
+single input of a json configuration file.
+
+Storing the configuration as json gives us several advantages.
+- It is easy to validate
+- It is human readable
+- It can be easily compared with other configurations
+- It is easy to extend  
+
+The config will support mandatory and optional settings as follows.
+````json
+{
+  "log_level": "debug",
+  "urls_to_spider": [ ],
+  "optional": {
+    "urls_to_ignore": [ ],
+    "sitemap_urls": [ ],
+    "domains_to_spider": [ ],
+    "user_agent_for_requests": "",
+    "headers_for_requests": { },
+    "cookies_for_requests": { }
+  }
+}
+````
+
+#### General notes
+Note the [ ] notation indicates the tool expects zero or more string values.
+The { } notation indicates the tool expects a set of key->value pairs. 
+The optional block can be left empty, or configured as you see fit.
+
+#### log_level (mandatory)
+The log_level can be set to one of the following
+- debug
+- info
+- warn
+- error
+- fatal
+
+#### urls_to_spider (mandatory)
+The urls_to_spider array must contain at least one fully qualified url to start with, but can be (n) fully qualified urls including urls that you want 
+to test but that the spider will not locate on its own
+
+#### user_agent_for_requests (mandatory)
+The user_agent_for_requests string must be set to a user agent of your choosing that will be sent on all requests.
+If you find you need to request your pages with a list of user agents, you should create a separate config file per 
+user agent.
+
+#### urls_to_ignore (optional)
+The urls_to_ignore array can contain 0 or more fully qualified urls to ignore when spidering.
+We will add support for regular expressions later.
+
+#### sitemap_urls (optional)
+The sitemap_urls array can contain 0 or more fully qualified sitemap urls to reference w.r.t. URLs we want to add to the list of URLs 
+to be spidered. We will discuss the types of sitemap content we will support later.
+
+#### domains_to_spider (optional)
+The domains_to_spider array can contain 0 or more domains that should be spidered. An example would be where you begin 
+on domain www.example.com but also want to spider into a child domain such as abc.example.com.
+Note you may wish instead to use two separate configs one per domain to keep things small and lean.
+
+#### headers_for_requests (optional)
+The headers_for_requests hash can be set to (n) key->value pairings of form
+```json
+{
+   "some header": "some value",
+   "some other header": "some other value"   
+}
+```
+These will be sent on each request.
+An example might be where you are testing a site that returns different content for different headers such as useragent,
+language and other similar content differentiators. 
+
+#### cookies_for_requests (optional)
+The cookies_for_requests hash can be set to (n) key->value pairings of form
+```json
+{
+   "some cookie name": "some cookie value",
+   "some other cookie name": "some other cookie value"   
+}
+```
+These will be sent on each request.
+
+#### Validating your config
+Config files can be validated easily, to run the validation simply run
+````
+rake validate_config["<path to the config file>"]
+````
+
+
+### Running
+TODO (run, output)
 
 ## Licence
 Software is released under the [MIT License](LICENSE).

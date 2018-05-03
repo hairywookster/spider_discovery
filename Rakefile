@@ -2,6 +2,7 @@
 #Run   rake -T   to see what is available
 require 'rubygems'
 require 'rake'
+require 'active_support/all'
 require 'fileutils'
 require 'json'
 require 'mechanize'
