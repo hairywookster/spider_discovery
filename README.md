@@ -34,11 +34,11 @@ We need to consider the following additional aspects.
   - For example www.example.com may reference abc.example.com and we may wish to spider both systems as one.
 
 ## Installation
-# Install rvm (assuming your on a flavor of linux) (otherwise see windows alternative) 
-# Install Ruby 2.3+
-# Optionally setup your .rvmrc and gem sandbox 
-# gem install bundler
-# bundle install
+- Install rvm (assuming your on a flavor of linux) (otherwise see windows alternative) 
+- Install Ruby 2.3+
+- Optionally setup your .rvmrc and gem sandbox 
+- gem install bundler
+- bundle install
 
 ## Usage
 TODO (configure, run, output)
