@@ -9,6 +9,8 @@ require 'mechanize'
 require 'methodize'
 require 'metainspector'
 require 'logger'
+require 'rexml/document'
+require 'nokogiri'
 
 def auto_require(path)
   Dir["#{File.dirname(__FILE__)}#{path}/*.rb"].each do |file|
@@ -34,10 +36,15 @@ task :default => 'help'
 
 desc 'runs the discovery using the config specified. Usage: run_discovery["<path to the config file>"]'
 task :run_discovery, :config_file do |t, args|
-  Spider.discover_all_urls( args[:config_file] )
+  Spider.discover_all_urls( ConfigValidator.init_config( args[:config_file] ) )
 end
 
 desc 'validates the config file is valid. Usage: validate_config["<path to the config file>"]'
 task :validate_config, :config_file do |t, args|
   ConfigValidator.validate_config_file( args[:config_file] )
+end
+
+desc 'collates urls from the sitemaps specified in the config file. Usage: collate_sitemap_urls["<path to the config file>"]'
+task :collate_sitemap_urls, :config_file do |t, args|
+  SitemapUrlCollator.collate_urls( ConfigValidator.init_config( args[:config_file] ) )
 end

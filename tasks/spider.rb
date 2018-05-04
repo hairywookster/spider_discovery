@@ -1,10 +1,7 @@
 class Spider
 
-  def self.discover_all_urls( config_file )
-    puts "This method will pull in the config from #{config_file} and run the spider-ing process to discover all urls"
-
-    config = ConfigValidator.validate_config_file( config_file )
-    Log.init_logger( config.log_level )
+  def self.discover_all_urls( config )
+    puts "This method will implement the spidering activity using the supplied config\n#{config.to_json}"
 
     #todo implement me
 

@@ -56,11 +56,12 @@ The config will support mandatory and optional settings as follows.
 {
   "log_level": "debug",
   "urls_to_spider": [ ],
+  "user_agent_for_requests": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36",
+  "delay_between_requests_in_milliseconds": 100,
   "optional": {
     "urls_to_ignore": [ ],
     "sitemap_urls": [ ],
     "domains_to_spider": [ ],
-    "user_agent_for_requests": "",
     "headers_for_requests": { },
     "cookies_for_requests": { }
   }
@@ -88,6 +89,9 @@ to test but that the spider will not locate on its own
 The user_agent_for_requests string must be set to a user agent of your choosing that will be sent on all requests.
 If you find you need to request your pages with a list of user agents, you should create a separate config file per 
 user agent.
+
+#### delay_between_requests_in_milliseconds (mandatory)
+The delay_between_requests_in_milliseconds must be set to a positive integer >= 0 and will be used to set the time between each request.
 
 #### urls_to_ignore (optional)
 The urls_to_ignore array can contain 0 or more fully qualified urls to ignore when spidering.

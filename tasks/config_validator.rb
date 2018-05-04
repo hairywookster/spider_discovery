@@ -1,5 +1,11 @@
 class ConfigValidator
 
+  def self.init_config( config_file )
+    config = ConfigValidator.validate_config_file( config_file )
+    Log.init_logger config.log_level
+    config
+  end
+
   def self.validate_config_file( config_file )
     puts "Validating config held inside #{File.expand_path(config_file)}"
 
@@ -15,6 +21,7 @@ class ConfigValidator
       validate_sitemap_urls( json_obj, collected_errors )
       validate_domains_to_spider( json_obj, collected_errors )
       validate_user_agent_for_requests( json_obj, collected_errors )
+      validate_delay_between_requests_in_milliseconds( json_obj, collected_errors )
       validate_headers_for_requests( json_obj, collected_errors )
       validate_cookies_for_requests( json_obj, collected_errors )
 
@@ -53,6 +60,12 @@ private
     end
   end
 
+  def self.validate_delay_between_requests_in_milliseconds( json_obj, collected_errors )
+    unless json_obj.delay_between_requests_in_milliseconds.is_a?( Integer ) && json_obj.delay_between_requests_in_milliseconds >= 0
+      collected_errors << "Delay between requests in milliseconds in config file as key delay_between_requests_in_milliseconds=#{json_obj.delay_between_requests_in_milliseconds} is invalid, it must be set to a positive integer"
+    end
+  end
+
   def self.validate_urls_to_ignore( json_obj, collected_errors )
     validate_url_references( json_obj.optional.urls_to_ignore, collected_errors, 'urls_to_ignore' )
   end
@@ -64,23 +77,42 @@ private
   def self.validate_domains_to_spider( json_obj, collected_errors )
     unless json_obj.optional.domains_to_spider.empty?
       json_obj.optional.domains_to_spider.each do |domain_to_validate|
-        #todo check it conforms to reg expression for sane domains or simple check of not blank and no spaces
+        if domain_to_validate.blank?
+          collected_errors << "Domains to spider in key domains_to_spider=#{json_obj.optional.domains_to_spider} is invalid, it must contain entries that are not blank"
+        end
       end
     end
   end
 
   def self.validate_headers_for_requests( json_obj, collected_errors )
-    #todo check headers and values are sane
+    validate_non_blank_key_values( json_obj.optional.headers_for_requests, collected_errors, 'headers_for_requests' )
   end
 
   def self.validate_cookies_for_requests( json_obj, collected_errors )
-    #todo check cookies names and values are sane
+    validate_non_blank_key_values( json_obj.optional.cookies_for_requests, collected_errors, 'cookies_for_requests' )
+  end
+
+  def self.validate_non_blank_key_values( entries, collected_errors, config_field_name )
+    unless entries.empty?
+      entries.each do |key, value|
+        if key.blank?
+          collected_errors << "Key/Value in key #{config_field_name} key=#{key} value=#{value} is invalid, it must contain key/value pairs that are not blank"
+        end
+        if value.blank?
+          collected_errors << "Key/Value in key #{config_field_name} key=#{key} value=#{value} is invalid, it must contain key/value pairs that are not blank"
+        end
+      end
+    end
   end
 
   def self.validate_url_references( urls_to_validate, collected_errors, config_field_name )
     unless urls_to_validate.empty?
       urls_to_validate.each do |url_to_validate|
-        #todo check it conforms to reg expression for urls
+        if url_to_validate.blank?
+          collected_errors << "Url in key #{config_field_name} url=#{url_to_validate} is invalid, it must not be blank"
+        elsif !( url_to_validate.start_with?( 'http://' ) || url_to_validate.start_with?( 'https://' ) )
+          collected_errors << "Url in key #{config_field_name} url=#{url_to_validate} is invalid, it should be a fully qualified domain starting with http:// or https://"
+        end
       end
     end
   end
