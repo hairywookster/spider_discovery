@@ -3,7 +3,7 @@ A simple spider tool to identify testable areas of a website
 
 ## Introduction
 A frequent task when maintaining web sites is to validate that the pages in the site are functioning correctly.
-We frequently want to test multiple aspects of these pages to determine if our system is working correctly.
+We frequently want to test multiple aspects of these pages.
 But first we need a way to identify the existing pages.
 Once we have discovered our pages we can use the output of the spider in subsequent automated test tools.
 
@@ -99,7 +99,7 @@ We will add support for regular expressions later.
 
 #### sitemap_urls (optional)
 The sitemap_urls array can contain 0 or more fully qualified sitemap urls to reference w.r.t. URLs we want to add to the list of URLs 
-to be spidered. We will discuss the types of sitemap content we will support later.
+to be spidered. We will discuss the types of sitemap content we will support below.
 
 #### domains_to_spider (optional)
 The domains_to_spider array can contain 0 or more domains that should be spidered. An example would be where you begin 
@@ -128,10 +128,17 @@ The cookies_for_requests hash can be set to (n) key->value pairings of form
 ```
 These will be sent on each request.
 
-#### Validating your config
+### Validating your config
 Config files can be validated easily, to run the validation simply run
 ````
 rake validate_config["<path to the config file>"]
+````
+
+### Sitemap collation
+You can pre-test the output from the collation of urls included in your configured sitemap(s)
+by running the following command
+````
+rake collate_sitemap_urls["<path to the config file>"]
 ````
 
 

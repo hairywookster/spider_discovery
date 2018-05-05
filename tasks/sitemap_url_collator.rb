@@ -4,13 +4,14 @@ class SitemapUrlCollator
 
   def self.collate_urls( config )
     collected_urls = []
+    headers = build_headers( config )
     if config.optional.sitemap_urls.empty?
       Log.logger.info( "Collating urls from configured sitemaps")
       collected_urls
     else
       Log.logger.info( "Collating urls from configured sitemaps")
       sitemaps_to_process = config.optional.sitemap_urls.clone
-      process_sitemaps( sitemaps_to_process, collected_urls )
+      process_sitemaps( sitemaps_to_process, headers, config, collected_urls )
       Log.logger.info("Located urls\n#{collected_urls.join("\n")}")
       collected_urls
     end
@@ -18,17 +19,17 @@ class SitemapUrlCollator
 
 private
 
-  def self.process_sitemaps( sitemaps_to_process, collected_urls )
+  def self.process_sitemaps( sitemaps_to_process, headers, config, collected_urls )
     processed_sitemaps = []
     loop do
       sitemap_url = sitemaps_to_process.pop
-      processs_sitemap( sitemap_url, sitemaps_to_process, processed_sitemaps, collected_urls )
+      processs_sitemap( sitemap_url, config, headers, sitemaps_to_process, processed_sitemaps, collected_urls )
       break if sitemaps_to_process.empty?
     end
   end
 
-  def self.processs_sitemap( sitemap_url, sitemaps_to_process, processed_sitemaps, collected_urls )
-    sitemap_content = get_sitemap_content( sitemap_url )
+  def self.processs_sitemap( sitemap_url, config, headers, sitemaps_to_process, processed_sitemaps, collected_urls )
+    sitemap_content = get_sitemap_content( sitemap_url, headers )
     processed_sitemaps << sitemap_url
     unless sitemap_content.nil?
 
@@ -38,14 +39,16 @@ private
 
         as_xml_doc.elements.each('sitemapindex/sitemap/loc') do |location_element|
           url = location_element.text
-          # todo add code to reject sitemap urls if not in domains to be spidered and such
-          sitemaps_to_process << url unless sitemaps_to_process.include?( url )
+          if url_should_be_included?( url, sitemaps_to_process, config )
+            sitemaps_to_process << url
+          end
         end
 
         as_xml_doc.elements.each('sitemapindex/urlset/url/loc') do |location_element|
           url = location_element.text
-          # todo add code to reject urls if not in domains to be spidered and such
-          collected_urls << url unless collected_urls.include?( url )
+          if url_should_be_included?( url, collected_urls, config )
+            collected_urls << url
+          end
         end
 
       rescue => ex
@@ -55,14 +58,13 @@ private
     end
   end
 
-  def self.get_sitemap_content( sitemap_url )
+  def self.get_sitemap_content( sitemap_url, headers )
     begin
       agent = Mechanize.new do |a|
         a.agent.verify_mode = OpenSSL::SSL::VERIFY_NONE   #disabled SSL check
         a.agent.gzip_enabled = false                      #gzip seems flaky so disabled
       end
-      #todo add the useragent from our config file...
-      page = agent.get( sitemap_url, nil, nil, {} )
+      page = agent.get( sitemap_url, nil, nil, headers )
       if 200.eql?( page.code.to_i )
         Log.logger.info( "Success: Get sitemap_url=#{sitemap_url}")
         page.body
@@ -73,6 +75,49 @@ private
     rescue Mechanize::ResponseCodeError => ex
       Log.logger.error( "Error: Could not GET sitemap_url=#{sitemap_url}")
       nil
+    end
+  end
+
+  def self.build_headers( config )
+    headers = config.optional.headers_for_requests.clone
+    headers[ 'User-Agent' ] = config.user_agent_for_requests
+    #todo add cookies
+    headers
+  end
+
+  def self.url_should_be_included?( url, urls, config )
+    unless urls.include?( url )
+      if should_spider_domain?( url, config ) &&
+         should_include_url?( url, config )
+        return true
+      end
+    end
+    false
+  end
+
+  def self.should_spider_domain?( url, config )
+    if config.optional.domains_to_spider.empty?
+      true
+    else
+      config.optional.domains_to_spider.each do |domain|
+        if url.include?( domain )
+          return true
+        end
+      end
+      false
+    end
+  end
+
+  def self.should_include_url?( url, config )
+    if config.optional.urls_to_ignore.empty?
+      true
+    else
+      config.optional.urls_to_ignore.each do |url_to_ignore|
+        if url.include?( url_to_ignore )
+          return false
+        end
+      end
+      true
     end
   end
 
