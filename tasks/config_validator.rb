@@ -7,6 +7,7 @@ class ConfigValidator
   end
 
   def self.validate_config_file( config_file )
+    #todo replace these puts with Log...with temp init
     puts "Validating config held inside #{File.expand_path(config_file)}"
 
     collected_errors = []
@@ -21,7 +22,7 @@ class ConfigValidator
       validate_sitemap_urls( json_obj, collected_errors )
       validate_domains_to_spider( json_obj, collected_errors )
       validate_user_agent_for_requests( json_obj, collected_errors )
-      validate_delay_between_requests_in_milliseconds( json_obj, collected_errors )
+      validate_delay_between_requests_in_seconds( json_obj, collected_errors )
       validate_headers_for_requests( json_obj, collected_errors )
       validate_cookies_for_requests( json_obj, collected_errors )
 
@@ -60,9 +61,9 @@ private
     end
   end
 
-  def self.validate_delay_between_requests_in_milliseconds( json_obj, collected_errors )
-    unless json_obj.delay_between_requests_in_milliseconds.is_a?( Integer ) && json_obj.delay_between_requests_in_milliseconds >= 0
-      collected_errors << "Delay between requests in milliseconds in config file as key delay_between_requests_in_milliseconds=#{json_obj.delay_between_requests_in_milliseconds} is invalid, it must be set to a positive integer"
+  def self.validate_delay_between_requests_in_seconds( json_obj, collected_errors )
+    unless json_obj.delay_between_requests_in_seconds.is_a?( Float ) && json_obj.delay_between_requests_in_seconds >= 0
+      collected_errors << "Delay between requests in milliseconds in config file as key delay_between_requests_in_seconds=#{json_obj.delay_between_requests_in_seconds} is invalid, it must be set to a positive integer"
     end
   end
 

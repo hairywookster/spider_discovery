@@ -24,6 +24,9 @@ private
     loop do
       sitemap_url = sitemaps_to_process.pop
       processs_sitemap( sitemap_url, config, headers, sitemaps_to_process, processed_sitemaps, collected_urls )
+      unless sitemaps_to_process.empty?
+        sleep config.delay_between_requests_in_seconds
+      end
       break if sitemaps_to_process.empty?
     end
   end
@@ -39,14 +42,14 @@ private
 
         as_xml_doc.elements.each('sitemapindex/sitemap/loc') do |location_element|
           url = location_element.text
-          if url_should_be_included?( url, sitemaps_to_process, config )
+          if SpiderUtils.url_should_be_included?( url, sitemaps_to_process, config )
             sitemaps_to_process << url
           end
         end
 
         as_xml_doc.elements.each('sitemapindex/urlset/url/loc') do |location_element|
           url = location_element.text
-          if url_should_be_included?( url, collected_urls, config )
+          if SpiderUtils.url_should_be_included?( url, collected_urls, config )
             collected_urls << url
           end
         end
@@ -80,45 +83,11 @@ private
 
   def self.build_headers( config )
     headers = config.optional.headers_for_requests.clone
+    #https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent
     headers[ 'User-Agent' ] = config.user_agent_for_requests
-    #todo add cookies
+    #https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cookie
+    headers[ 'Cookie' ] = config.optional.cookies_for_requests.map {|k,v| "#{k}=#{v}"}.join('; ')
     headers
-  end
-
-  def self.url_should_be_included?( url, urls, config )
-    unless urls.include?( url )
-      if should_spider_domain?( url, config ) &&
-         should_include_url?( url, config )
-        return true
-      end
-    end
-    false
-  end
-
-  def self.should_spider_domain?( url, config )
-    if config.optional.domains_to_spider.empty?
-      true
-    else
-      config.optional.domains_to_spider.each do |domain|
-        if url.include?( domain )
-          return true
-        end
-      end
-      false
-    end
-  end
-
-  def self.should_include_url?( url, config )
-    if config.optional.urls_to_ignore.empty?
-      true
-    else
-      config.optional.urls_to_ignore.each do |url_to_ignore|
-        if url.include?( url_to_ignore )
-          return false
-        end
-      end
-      true
-    end
   end
 
 end

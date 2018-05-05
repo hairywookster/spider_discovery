@@ -34,9 +34,9 @@ end
 
 task :default => 'help'
 
-desc 'runs the discovery using the config specified. Usage: run_discovery["<path to the config file>"]'
-task :run_discovery, :config_file do |t, args|
-  Spider.discover_all_urls( ConfigValidator.init_config( args[:config_file] ) )
+desc 'runs the discovery using the config specified. Usage: run_discovery["<path to the config file>", "<path to result output file>"]'
+task :run_discovery, :config_file, :result_file do |t, args|
+  Spider.discover_all_urls( ConfigValidator.init_config( args[:config_file] ), args[:result_file] )
 end
 
 desc 'validates the config file is valid. Usage: validate_config["<path to the config file>"]'

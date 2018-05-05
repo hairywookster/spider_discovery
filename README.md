@@ -57,7 +57,7 @@ The config will support mandatory and optional settings as follows.
   "log_level": "debug",
   "urls_to_spider": [ ],
   "user_agent_for_requests": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36",
-  "delay_between_requests_in_milliseconds": 100,
+  "delay_between_requests_in_seconds": 0.1,
   "optional": {
     "urls_to_ignore": [ ],
     "sitemap_urls": [ ],
@@ -90,8 +90,9 @@ The user_agent_for_requests string must be set to a user agent of your choosing 
 If you find you need to request your pages with a list of user agents, you should create a separate config file per 
 user agent.
 
-#### delay_between_requests_in_milliseconds (mandatory)
-The delay_between_requests_in_milliseconds must be set to a positive integer >= 0 and will be used to set the time between each request.
+#### delay_between_requests_in_seconds (mandatory)
+The delay_between_requests_in_seconds must be set to a positive float >= 0 (i.e. 0.1 is 100 milliseconds, 1 is 1 second) 
+and will be used to set the time between each request.
 
 #### urls_to_ignore (optional)
 The urls_to_ignore array can contain 0 or more fully qualified urls to ignore when spidering.
@@ -140,7 +141,9 @@ by running the following command
 ````
 rake collate_sitemap_urls["<path to the config file>"]
 ````
-
+The process will find and follow sitemapindex/sitemap/loc (other sitemaps) and all sitemapindex/urlset/url/loc.
+It only follows and collates urls that pass the rules defined in the domains_to_spider and urls_to_ignore configuration.
+The requests to the sitemap are made with the configured user_agent_for_requests, headers_for_requests, cookies_for_requests. 
 
 ### Running
 TODO (run, output)
