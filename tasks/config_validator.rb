@@ -7,8 +7,8 @@ class ConfigValidator
   end
 
   def self.validate_config_file( config_file )
-    #todo replace these puts with Log...with temp init
-    puts "Validating config held inside #{File.expand_path(config_file)}"
+    Log.init_logger 'debug'
+    Log.logger.info "Validating config held inside #{File.expand_path(config_file)}"
 
     collected_errors = []
     begin
@@ -23,19 +23,20 @@ class ConfigValidator
       validate_domains_to_spider( json_obj, collected_errors )
       validate_user_agent_for_requests( json_obj, collected_errors )
       validate_delay_between_requests_in_seconds( json_obj, collected_errors )
+      validate_report_progress_every_n_urls_processed( json_obj, collected_errors )
       validate_headers_for_requests( json_obj, collected_errors )
       validate_cookies_for_requests( json_obj, collected_errors )
 
       if collected_errors.empty?
-        puts "Success: #{config_file} is valid"
+        Log.logger.info "Success: #{config_file} is valid"
       else
-        puts "Error: config is invalid"
-        puts collected_errors.join("\n")
+        Log.logger.info "Error: config is invalid"
+        Log.logger.info collected_errors.join("\n")
       end
       json_obj
     rescue Exception => erd
-      puts "Error: config is invalid, it was not valid json, if in doubt google jsonlint :)"
-      puts "#{erd.to_s}\n#{erd.backtrace.join("\n")}"
+      Log.logger.error "Error: config is invalid, it was not valid json, if in doubt google jsonlint :)"
+      Log.logger.error "#{erd.to_s}\n#{erd.backtrace.join("\n")}"
     end
 
   end
@@ -63,7 +64,13 @@ private
 
   def self.validate_delay_between_requests_in_seconds( json_obj, collected_errors )
     unless json_obj.delay_between_requests_in_seconds.is_a?( Float ) && json_obj.delay_between_requests_in_seconds >= 0
-      collected_errors << "Delay between requests in milliseconds in config file as key delay_between_requests_in_seconds=#{json_obj.delay_between_requests_in_seconds} is invalid, it must be set to a positive integer"
+      collected_errors << "Delay between requests in milliseconds in config file as key delay_between_requests_in_seconds=#{json_obj.delay_between_requests_in_seconds} is invalid, it must be set to a positive float"
+    end
+  end
+
+  def self.validate_report_progress_every_n_urls_processed( json_obj, collected_errors )
+    unless json_obj.report_progress_every_n_urls_processed.is_a?( Integer ) && json_obj.report_progress_every_n_urls_processed >= 0
+      collected_errors << "Report progress every n urls processed in config file as key report_progress_every_n_urls_processed=#{json_obj.report_progress_every_n_urls_processed} is invalid, it must be set to a positive integer"
     end
   end
 

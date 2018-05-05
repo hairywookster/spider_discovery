@@ -36,4 +36,13 @@ class SpiderUtils
     end
   end
 
+  def self.build_headers( config )
+    headers = config.optional.headers_for_requests.clone
+    #https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent
+    headers[ 'User-Agent' ] = config.user_agent_for_requests
+    #https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cookie
+    headers[ 'Cookie' ] = config.optional.cookies_for_requests.map {|k,v| "#{k}=#{v}"}.join('; ')
+    headers
+  end
+
 end

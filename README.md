@@ -94,6 +94,11 @@ user agent.
 The delay_between_requests_in_seconds must be set to a positive float >= 0 (i.e. 0.1 is 100 milliseconds, 1 is 1 second) 
 and will be used to set the time between each request.
 
+#### report_progress_every_n_urls_processed
+The report_progress_every_n_urls_processed must be set to a value >= 0.
+If set to 0 now progress will be emitted when running in info logging level.
+If set to say, 100, you will see a statement after every 100 urls have been processed
+
 #### urls_to_ignore (optional)
 The urls_to_ignore array can contain 0 or more fully qualified urls to ignore when spidering.
 We will add support for regular expressions later.
@@ -146,7 +151,16 @@ It only follows and collates urls that pass the rules defined in the domains_to_
 The requests to the sitemap are made with the configured user_agent_for_requests, headers_for_requests, cookies_for_requests. 
 
 ### Running
-TODO (run, output)
+Once your happy that your config is valid and your sitemaps are configured (or skipped) you can run the spider in anger.
+If you are at all unsure always set the value of delay_between_requests_in_seconds to a higher figure, say 10 seconds,
+to allow you to stop the process if required.
+
+To run the process run this command
+````
+run_discovery["<path to the config file>", "<path to result output file>"]
+````
+
+TODO DOCUMENT OUTPUTS
 
 ## Licence
 Software is released under the [MIT License](LICENSE).

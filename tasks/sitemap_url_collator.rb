@@ -4,7 +4,7 @@ class SitemapUrlCollator
 
   def self.collate_urls( config )
     collected_urls = []
-    headers = build_headers( config )
+    headers = SpiderUtils.build_headers( config )
     if config.optional.sitemap_urls.empty?
       Log.logger.info( "Collating urls from configured sitemaps")
       collected_urls
@@ -79,15 +79,6 @@ private
       Log.logger.error( "Error: Could not GET sitemap_url=#{sitemap_url}")
       nil
     end
-  end
-
-  def self.build_headers( config )
-    headers = config.optional.headers_for_requests.clone
-    #https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent
-    headers[ 'User-Agent' ] = config.user_agent_for_requests
-    #https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cookie
-    headers[ 'Cookie' ] = config.optional.cookies_for_requests.map {|k,v| "#{k}=#{v}"}.join('; ')
-    headers
   end
 
 end
