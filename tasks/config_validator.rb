@@ -83,10 +83,10 @@ private
   end
 
   def self.validate_domains_to_spider( json_obj, collected_errors )
-    unless json_obj.optional.domains_to_spider.empty?
-      json_obj.optional.domains_to_spider.each do |domain_to_validate|
+    unless json_obj.domains_to_spider.empty?
+      json_obj.domains_to_spider.each do |domain_to_validate|
         if domain_to_validate.blank?
-          collected_errors << "Domains to spider in key domains_to_spider=#{json_obj.optional.domains_to_spider} is invalid, it must contain entries that are not blank"
+          collected_errors << "Domains to spider in key domains_to_spider=#{json_obj.domains_to_spider} is invalid, it must contain entries that are not blank"
         end
       end
     end

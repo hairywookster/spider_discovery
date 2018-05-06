@@ -11,10 +11,10 @@ class SpiderUtils
   end
 
   def self.should_spider_domain?( url, config )
-    if config.optional.domains_to_spider.empty?
+    if config.domains_to_spider.empty?
       true
     else
-      config.optional.domains_to_spider.each do |domain|
+      config.domains_to_spider.each do |domain|
         if url.include?( domain )
           return true
         end

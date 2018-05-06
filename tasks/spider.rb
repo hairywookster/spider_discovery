@@ -1,15 +1,9 @@
 class Spider
 
-  FAILED = 'FAILED'
-
-  def self.discover_all_urls( config, result_file )
-    Log.logger.info( "Starting spidering process" )
-    Log.logger.info( "Using the supplied config\n#{config.to_json}" )
-    Log.logger.info( "Results will be emitted into #{result_file}" )
-
+  def self.discover_all_urls( config, results_folder )
+    emit_spider_info( config, results_folder )
     headers = SpiderUtils.build_headers( config )
-    urls_from_sitemaps = SitemapUrlCollator.collate_urls( config )
-    urls_to_spider = ( config.urls_to_spider + urls_from_sitemaps ).uniq
+    urls_to_spider = ( config.urls_to_spider + SitemapUrlCollator.collate_urls( config ) ).uniq
     Log.logger.debug( "Initial Urls to spider are\n#{urls_to_spider.join("\n")}" )
 
     #Note we may make this multi threaded later but for the moment lets keep things simple
@@ -24,11 +18,15 @@ class Spider
       break if urls_to_spider.empty?
     end
 
-    # todo implement reporting with contents of urls_to_spider
+    Report.emit_reports( urls_visited_results, results_folder )
+  end
 
-    File.open(config.result_file, "w") do |f|
-      f.puts(urls_visited_results.to_json)
-    end
+private
+
+  def self.emit_spider_info( config, results_folder )
+    Log.logger.info( "Starting spidering process" )
+    Log.logger.info( "Using the supplied config\n#{config.to_json}" )
+    Log.logger.info( "Results will be emitted into #{results_folder}" )
   end
 
   def self.report_progress( urls_visited_results, urls_to_spider, report_progress_every_n_urls_processed )
@@ -69,22 +67,22 @@ class Spider
 
       rescue Faraday::TimeoutError => ex
         Log.logger.error( "Error: Timeout connecting to #{url}. Faraday::TimeoutError#{ex}" )
-        urls_visited_results[url] = FAILED
+        urls_visited_results[url] = Report::FAILED
       rescue Faraday::ConnectionFailed => ex
         Log.logger.error( "Error: Connection failed connecting to #{url}. Faraday::ConnectionFailed#{ex}" )
-        urls_visited_results[url] = FAILED
+        urls_visited_results[url] = Report::FAILED
       rescue MetaInspector::RequestError  => ex
         Log.logger.error( "Error: Request failed to #{url}. MetaInspector::RequestError#{ex}" )
-        urls_visited_results[url] = FAILED
+        urls_visited_results[url] = Report::FAILED
       rescue Net::OpenTimeout => ex
         Log.logger.error( "Error: Open Timeout connecting to #{url}. Net::OpenTimeout#{ex}" )
-        urls_visited_results[url] = FAILED
+        urls_visited_results[url] = Report::FAILED
       rescue MetaInspector::TimeoutError => ex
         Log.logger.error( "Error: Timeout connecting to #{url}. MetaInspector::TimeoutError#{ex}" )
-        urls_visited_results[url] = FAILED
+        urls_visited_results[url] = Report::FAILED
       rescue FaradayMiddleware::RedirectLimitReached => ex
         Log.logger.error( "Error: Redirect limit reached connecting to #{url}. FaradayMiddleware::RedirectLimitReached#{ex}" )
-        urls_visited_results[url] = FAILED
+        urls_visited_results[url] = Report::FAILED
       end
     else
       Log.logger.debug( "Skipped url=#{url}" )
