@@ -6,7 +6,7 @@ class SitemapUrlCollator
     collected_urls = []
     headers = SpiderUtils.build_headers( config )
     if config.optional.sitemap_urls.empty?
-      Log.logger.info( "Collating urls from configured sitemaps")
+      Log.logger.info( "Skipping sitemap collation")
       collected_urls
     else
       Log.logger.info( "Collating urls from configured sitemaps")

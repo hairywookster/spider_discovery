@@ -26,7 +26,7 @@
   <div class="container-fluid">
     <div class="row">
       <div class="col-md-12">
-        <% if total_errors.empty? %>
+        <% if total_errors == 0 %>
           <div class="alert alert-success" role="alert">Everything is A-OK !</div>
         <% else %>
           <div class="alert alert-danger" role="alert">Awww snap - fix me please i'm <%= random_failure_word %></div>

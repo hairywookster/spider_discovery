@@ -37,8 +37,8 @@ class ConfigValidator
     rescue Exception => erd
       Log.logger.error "Error: config is invalid, it was not valid json, if in doubt google jsonlint :)"
       Log.logger.error "#{erd.to_s}\n#{erd.backtrace.join("\n")}"
+      nil  #todo raise an error
     end
-
   end
 
 private

@@ -5,9 +5,9 @@ class Report
   def self.emit_reports( urls_visited_results, results_folder )
     Log.logger.info( "Spidering completed, generating reports" )
     total = urls_visited_results.size
-    successes = h.select {|k, response_code| 200.eql?( response_code ) }
-    errors = h.select {|k, response_code| !200.eql?( response_code ) }
-    total_success =successful.size
+    successes = urls_visited_results.select {|k, response_code| 200.eql?( response_code ) }
+    errors = urls_visited_results.select {|k, response_code| !200.eql?( response_code ) }
+    total_success = successes.size
     total_errors = total - total_success
     percent_success = ( (total_success.to_f / total.to_f) * 100 ).to_i
     percent_errors = 100.to_f - percent_success
@@ -40,15 +40,15 @@ private
         :url_results => urls_visited_results
     }
     File.open("#{results_folder}/results.json", "w") do |f|
-      f.puts(result.to_json)
+      f.puts( JSON.pretty_generate( result.to_json ) )
     end
   end
 
   def self.emit_html_report( results_folder, urls_visited_results, total, total_success, percent_success, total_errors,
                              percent_errors, successes, errors )
-    random_failure_word = 'borked'
+    random_failure_word = 'borked'   #todo random wordage
     #note all the values passed into this method are used via the binding object when the template gets rendered
-    File.open("#{results_folder}/results.html", "w", 'w') do |file|
+    File.open("#{results_folder}/results.html", "w") do |file|
       file.puts ERB.new(File.read("#{File.dirname(__FILE__)}/html_report_template.html.erb")).result( binding )
     end
   end
