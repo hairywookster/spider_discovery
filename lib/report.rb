@@ -40,7 +40,7 @@ private
         :url_results => urls_visited_results
     }
     File.open("#{results_folder}/results.json", "w") do |f|
-      f.puts( JSON.pretty_generate( result.to_json ) )
+      f.puts( JSON.pretty_generate( result ) )
     end
   end
 
